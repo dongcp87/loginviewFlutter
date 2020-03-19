@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:loginview/api_response.dart';
 class LoginService {
   // final url = 'https://stg-sec-sso.click-sec.com/loginweb/tool-redirect?s=09&p=82';
   final url = 'https://jsonplaceholder.typicode.com/albums/1';
 
-  Future<String> login(String username, String password) async {
+  Future<APIResponse<String>> login(String username, String password) async {
     // final params = {
     //   'j_username': username,
     //   'j_password': password,
@@ -22,13 +23,19 @@ class LoginService {
     try {
       final response = await Dio().get(url);
       if (response.statusCode == 200) {
-
+        return APIResponse(ResponseStatus.success, null, null);
+      } else {
+        return APIResponse(ResponseStatus.httpErr, null, null);
       }
-      print(response);
     } on DioError catch(e) {
-      var mess = e.type;
-      print("e.message: $mess");
+      if (e.type == DioErrorType.DEFAULT) {
+        return APIResponse(ResponseStatus.connectionErr, null, null);
+      } else if (e.type == DioErrorType.CONNECT_TIMEOUT || e.type == DioErrorType.RECEIVE_TIMEOUT || e.type == DioErrorType.SEND_TIMEOUT) {
+        return APIResponse(ResponseStatus.connectionErr, null, null);
+      } else if (e.type == DioErrorType.RESPONSE) {
+        return APIResponse(ResponseStatus.httpErr, null, null);
+      }
+      return APIResponse(ResponseStatus.connectionErr, null, null);
     }
-    return "";
   }
 }
