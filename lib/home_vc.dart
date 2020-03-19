@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'login_service.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 class HomeVC extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -9,10 +10,25 @@ class HomeVC extends StatefulWidget {
 
 class _HomeState extends State<HomeVC> {
   bool isSwitched = false;
+  bool _isLoading = false;
+
+  LoginService _loginService = LoginService();
 
   @override
   Widget build(BuildContext context) {
-    return homeMainView(context);
+    return ModalProgressHUD(child: homeMainView(context), inAsyncCall: _isLoading);
+  }
+
+
+  void clickLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final response = await _loginService.login('username', 'password');
+    print(response);
+     setState(() {
+      _isLoading = false;
+    });
   }
 
   Widget homeMainView(BuildContext context) {
@@ -190,7 +206,7 @@ class _HomeState extends State<HomeVC> {
                       border: Border.all(color: Colors.black87, width: 4),
                       borderRadius: BorderRadius.all(Radius.circular(25))),
                   child: FlatButton(
-                      onPressed: null,
+                      onPressed: () => clickLogin(),
                       child: Text("Login",
                           style: TextStyle(
                               fontSize: 18,
@@ -204,38 +220,53 @@ class _HomeState extends State<HomeVC> {
 
   Widget copyrightLabel() {
     return Container(
-      margin: EdgeInsets.only(left: 8, right: 8),
-      child: Text(
-      "GMO click FX Neo",
-      style: TextStyle(color: Colors.white, fontSize: 18),
-    )
-    );
+        margin: EdgeInsets.only(left: 8, right: 8),
+        child: Text(
+          "GMO click FX Neo",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ));
   }
 
   Widget bottomView() {
     return Container(
       color: Colors.black,
       height: 70,
-      child: Container(margin: EdgeInsets.all(8),
+      child: Container(
+        margin: EdgeInsets.all(8),
         child: Row(
-        children: <Widget>[
-          SizedBox(
-            width: 8,
-          ),
-          Expanded(
-              child: Container(
-            decoration: BoxDecoration(border: Border.all(color: Colors.white)),
-          )),
-          SizedBox(
-            width: 50,
-          ),
-           Expanded(
-              child: Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(4)), color: Colors.blueGrey),
-            child: FlatButton(onPressed: null, child: Text("Login Demo", style: TextStyle(color: Colors.white),)),
-          ))
-        ],
-      ),),
+          children: <Widget>[
+            SizedBox(
+              width: 8,
+            ),
+            Expanded(
+                child: Container(
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.white)),
+              child: FlatButton(
+                  onPressed: null,
+                  child: Text(
+                    "Login Demo",
+                    style: TextStyle(color: Colors.white),
+                  )),
+            )),
+            SizedBox(
+              width: 50,
+            ),
+            Expanded(
+                child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                  color: Colors.blueGrey),
+              child: FlatButton(
+                  onPressed: null,
+                  child: Text(
+                    "Login Demo",
+                    style: TextStyle(color: Colors.white),
+                  )),
+            ))
+          ],
+        ),
+      ),
     );
   }
 }
